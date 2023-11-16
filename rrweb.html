@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/rrweb@latest/dist/rrweb.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/rrweb@latest/dist/rrweb.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/rrweb@latest/dist/rrweb.min.css"
+/>
+<style>
+    #playroot{
+        width: 300px;
+        height: 300px;
+        border: 1px solid;
+    }
+</style>
+</head>
+<body>
+    <input class="inp" type="text">
+    <button id="btn">展示alert</button>
+
+    <button id="play"> 回放 </button>
+
+    <div id="playroot"></div>
+    
+    <script>
+        const btn = document.getElementById('btn')
+        btn.onclick = function(){
+            alert(document.getElementsByClassName('inp')[0].value)
+        }
+        let events = [];
+
+
+        document.getElementById('play').onclick = function(){
+
+
+            const replayer = new rrweb.Replayer(events,{
+                root:document.getElementById('playroot')
+            });
+
+            // 播放
+            replayer.play();
+        }
+
+
+        let stopFn = rrweb.record({
+            emit(event) {
+                // 将 event 存入 events 数组中
+                if (events.length < 20) {
+                    // 当事件数量大于 100 时停止录制
+                    events.unshift(event);
+                    }else{
+                        stopFn();
+                        console.log('before:',events)
+            var rev = events.reverse()
+            console.log('after:',rev)
+                            console.log('停止录制！！',JSON.stringify({ events })['events'])
+                    }
+                // 
+            },
+        });
+
+// save 函数用于将 events 发送至后端存入，并重置 events 数组
+    function save() {
+    const body = JSON.stringify({ events });
+    events = [];
+    console.log('body:',body)
+    // fetch('http://YOUR_BACKEND_API', {
+    //     method: 'POST',
+    //     headers: {
+    //     'Content-Type': 'application/json',
+    //     },
+    //     body,
+    // });
+    }
+
+    save()
+
+// 每 10 秒调用一次 save 方法，避免请求过多
+// setInterval(save, 10* 1000);
+    </script>
+</body>
+</html>
