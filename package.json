@@ -1,0 +1,24 @@
+{
+  "name": "my-nodejss",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "ioredis": "^5.3.2",
+    "redis": "^2.8.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HuiHui-Liu666/my-nodejs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HuiHui-Liu666/my-nodejs/issues"
+  },
+  "homepage": "https://github.com/HuiHui-Liu666/my-nodejs#readme"
+}
