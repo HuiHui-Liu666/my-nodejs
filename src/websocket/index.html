@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.io</title>
+</head>
+<body>
+    <h1>Socket.io 客户端</h1>
+    <input type="text" id="msg">
+    <button id="btn"> 发送</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script> -->
+    <script>
+        var socket = io()
+        document.getElementById('btn').addEventListener('click',function(){
+            var value = document.getElementById('msg').value
+            socket.emit('chat msg',value)
+            document.getElementById('msg').value = ''
+        })
+        socket.on('message',(msg)=>{
+            console.log(msg)
+        })
+    </script>
+</body>
+</html>
