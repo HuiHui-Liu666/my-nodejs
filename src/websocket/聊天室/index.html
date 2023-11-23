@@ -89,6 +89,13 @@
 
                     console.log('连接成功')
                     this.checkServer()
+                    // 发送健全token --》过期的时间。
+                    const data = {
+                        event:'auth',
+                        message:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiZm9vYmFyIiwiaWF0IjoxNzAwNzA5NjAzLCJleHAiOjE3MDA3MTMyMDN9.qIoauKyNVwgnP0kjXRuFrVHr3RSvNmKt_TBwfg8lVnc',
+                    }
+                    // 主动鉴权：
+                    this.wsHandle.send(JSON.stringify(data))
                 },
                 // 关闭websocket连接
                 onClose(){

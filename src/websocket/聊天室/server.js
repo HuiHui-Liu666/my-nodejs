@@ -1,4 +1,12 @@
 const WebSocket = require('ws')
+const jwt = require('jsonwebtoken')
+
+// 产生token
+const token = jwt.sign({
+    data:'foobar',
+},'secret',{expiresIn: '1h'})
+// 直接讲token拿到 前端去
+console.log('token is '+token)
 
 const wss = new WebSocket.Server({ port: 8000 })
 var group = {} //充当一个计数器
@@ -9,6 +17,22 @@ wss.on('connection', function(ws) {
     ws.on('message', function(message) {
         // x需要广播到 其他客户端：
         var ob = JSON.parse(message.toString())
+        const token = ob.message
+        // 鉴权：
+        jwt.verify(token,'secret',function(err,decoded){
+            if(err){
+                console.log('token is invalid',err)
+                // 反给客户端一个消息
+                return
+            }
+            console.log('decoded',JSON.stringify(decoded))
+            ws.isAuth = true
+        })
+        if(!ws.isAuth){
+            // 给客户端发送重新鉴权的逻辑
+            return
+        }
+        
         if(ob.event==='heartbeat' && ob.message ==='pong'){
             ws.isAlive = true
             return
@@ -34,7 +58,6 @@ wss.on('connection', function(ws) {
             //     client.send(JSON.stringify(ob))
             // }
             ob.num = group[ws.roomid]
-            console.log('xxx:',client.readyState===WebSocket.OPEN && client.roomid ===ws.roomid)
             if(client.readyState===WebSocket.OPEN && client.roomid ===ws.roomid){
                 client.send(JSON.stringify(ob))
             }
