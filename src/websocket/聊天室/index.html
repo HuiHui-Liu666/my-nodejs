@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <!-- 用户输入昵称，之后就是欢迎该用户加入聊天室 -->
+        <div v-if="isShow">
+            昵称：<input type="text" v-model="name">
+            房间号：<input type="text" v-model="roomid">
+            <button @click="into">进入聊天室</button>
+        </div>
+
+        <div v-else>
+
+                <!-- 显示消息 -->
+                <ul>
+                    <li v-for="item in items">{{item.message}}</li>
+                </ul>
+                <!-- 发送消息 -->
+                <div class="ctrl">
+                    <input type="text" v-model="inputValue">
+                    <button type="button" @click="sendFunc()">发送</button>
+                </div>
+
+                <h2 >在线人数：{{num}}</h2>
+        </div>
+
+      </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script>
+            var app = new Vue({
+            el: '#app',
+            data: {
+                inputValue:'',
+                items: [],
+                wsHandle:'',
+                isShow:true,
+                name:'',
+                num:0,
+                roomid:''
+            },
+            mounted(){
+                var _this = this
+                this.wsHandle = new WebSocket('ws://127.0.0.1:8000')
+                this.wsHandle.onopen=this.onOpen
+                // 服务端发来的消息
+
+                this.wsHandle.onmessage = this.onmessage
+            },
+            methods:{
+                into(){
+                    if(this.name===''){
+                        alert('请输入用户名')
+                        return
+                    }
+                    // 发送个消息 xxx进入了聊天室
+                    this.wsHandle.send(JSON.stringify({
+                        name:this.name,
+                        roomid:this.roomid,
+                        event:'login'
+                    }))
+                    this.isShow=false
+                },
+                sendFunc(){
+                    this.wsHandle.send(JSON.stringify({
+                        message:this.inputValue,
+                        name:this.name,
+                        event:'message'
+                    }))
+                    this.items.push({
+                        message:this.name+":"+this.inputValue
+                    })
+                    console.log('发送了消息')
+                    this.inputValue = ''
+                },
+                onOpen(){
+                    // 相当于常见连接：
+                    console.log('连接成功')
+                },
+                onmessage(e){
+                     // 把数据推送到items中
+                     var obj = JSON.parse(e.data)
+                    if(obj.num){
+                        this.num = obj.num
+                    }
+                     if(obj.event === 'login'){
+                        this.items.push({message:"欢迎"+obj.name+"进入了聊天室"})
+                     }else if(obj.event === 'logout'){
+                        this.items.push({message:obj.name+"已经退出了聊天室"})
+
+                     }else{
+                        if(obj.name !==this.name){
+                            //  判断 需要用户名存在
+                            this.items.push({message:obj.name+":"+obj.message})
+
+                        }
+                     }
+
+                }
+            }
+            })
+    </script>
+</body>
+</html>
